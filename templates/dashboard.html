@@ -21,15 +21,89 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
   </head>
 <body>
-
+<div class="container">
+<div class="row">
+  <h1>Total</h1>
+  <div class="col-md-6">
+    <h3>Writes per second</h3>
+    <div id="events_calls-chart"></div>
+  </div>
+  <div class="col-md-6">
+    <h3>Reads per second</h3>
+    <div id="get_event_calls-chart"></div>
+  </div>
+</div>
+<div class="row">
+  <h1>Mongo</h1>
+  <div class="col-md-6">
+    <h3>Writes per second</h3>
+    <div id="mongo_save_event_calls-chart"></div>
+  </div>
+  <div class="col-md-6">
+    <h3>Reads per second</h3>
+    <div id="mongo_get_event_by_id_calls-chart"></div>
+  </div>
+</div>
+</div>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/metrics');
-    socket.on('metrics', function(data) {
-        console.log(data);
+  var gauges = {};
+  var last_counts = {};
+
+  function make_gauge(data_source, units) {
+    var data_def = {
+      columns: [
+        [data_source, 0]
+      ],
+      types: {}
+    };
+    data_def.types[data_source] = 'gauge';
+    gauges[data_source] = c3.generate({
+      bindto: '#' + data_source + '-chart', 
+      data: data_def, 
+      gauge: {
+        max: 100, 
+        units: ' ' + units,
+        label: {
+          format: function(value, ratio) {
+            return value.toFixed(1);
+          }
+        }
+      }
     });
+  }
+
+  make_gauge('events_calls', 'wps');
+  make_gauge('get_event_calls', 'rps');
+  make_gauge('mongo_save_event_calls', 'wps');
+  make_gauge('mongo_get_event_by_id_calls', 'rps');
+
+  var socket = io.connect('http://' + document.domain + ':' + location.port + '/metrics');
+  socket.on('metrics', function(data) {
+    for (var k in data) {
+      if (data.hasOwnProperty(k)) {
+        if (gauges[k]) {
+          var last = last_counts[k] || 0,
+              cur = data[k]['count'],
+              per = Math.max(0, cur - last);
+          last_counts[k] = cur;
+          gauges[k].load({
+            columns: [
+              [k, per]
+            ]
+          });
+        }
+      }
+    }
+    // console.log(data);
+  });
 </script>
   
 </body>

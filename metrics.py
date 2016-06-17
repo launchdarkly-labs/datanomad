@@ -19,5 +19,4 @@ class WebsocketReporter(Reporter):
     self.socketio.emit('metrics', metrics, namespace='/metrics')
 
   def _collect_metrics(self, registry):
-    print registry.dump_metrics()
     return registry.dump_metrics()
