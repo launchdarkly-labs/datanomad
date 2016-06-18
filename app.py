@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import logging
 from copy import copy
@@ -16,6 +17,14 @@ app = Flask(__name__)
 app.debug = 'DEBUG' in os.environ
 socketio = SocketIO(app)
 mongo_events.initialize('mongodb://127.0.0.1:27017/')
+ld_logger = logging.getLogger('ldclient')
+ld_logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+ld_logger.addHandler(ch)
 
 metrics_reporter = WebsocketReporter(registry=global_registry(), socketio=socketio, reporting_interval=1)
 metrics_reporter.start()

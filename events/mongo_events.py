@@ -1,6 +1,4 @@
 from pymongo import MongoClient
-import uuid
-from copy import copy
 from pyformance import time_calls
 
 client = None
@@ -25,10 +23,7 @@ def _events_coll():
     return db['events']
 
 @time_calls
-def mongo_save_event(evt_in):
-  """Inserts an event in the database, and returns the event with the generated id"""
-  evt = copy(evt_in)
-  evt['_id'] = str(uuid.uuid4())
+def mongo_save_event(evt):
   _events_coll().insert_one(evt)
   return evt
 

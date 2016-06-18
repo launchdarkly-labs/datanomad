@@ -1,7 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError
-import uuid
-from copy import copy
 from pyformance import time_calls
 from random import random
 
@@ -39,10 +37,7 @@ except ClientError as e:
 
 
 @time_calls
-def dynamo_save_event(evt_in):
-  """Inserts an event in the database, and returns the event with the generated id"""
-  evt = copy(evt_in)
-  evt['_id'] = str(uuid.uuid4())
+def dynamo_save_event(evt):
   if random() < 0.05:
     evt['hello'] = 'joe'
   table.put_item(Item=evt)
