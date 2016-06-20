@@ -38,8 +38,6 @@ except ClientError as e:
 
 @time_calls
 def dynamo_save_event(evt):
-  if random() < 0.05:
-    evt['hello'] = 'joe'
   table.put_item(Item=evt)
   return evt
 
