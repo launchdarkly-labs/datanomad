@@ -39,17 +39,6 @@
   </div>
 </div>
 <div class="row">
-  <h1>Mongo</h1>
-  <div class="col-md-6">
-    <h3>Writes per second</h3>
-    <div id="mongo_save_event_calls-chart"></div>
-  </div>
-  <div class="col-md-6">
-    <h3>Reads per second</h3>
-    <div id="mongo_get_event_by_id_calls-chart"></div>
-  </div>
-</div>
-<div class="row">
   <h1>Dynamo</h1>
   <div class="col-md-6">
     <h3>Writes per second</h3>
@@ -93,8 +82,6 @@
 
   make_gauge('events_calls', 'wps');
   make_gauge('get_event_calls', 'rps');
-  make_gauge('mongo_save_event_calls', 'wps');
-  make_gauge('mongo_get_event_by_id_calls', 'rps');
   make_gauge('dynamo_save_event_calls', 'wps');
   make_gauge('dynamo_get_event_by_id_calls', 'rps');
 
